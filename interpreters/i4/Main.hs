@@ -33,6 +33,7 @@ liftBoolOp f _            _            = BoolVal False
 eval :: Exp -> Env -> Val
 eval (IntExp i) _ = IntVal i
 eval (BoolExp b) _ = BoolVal b
+eval (IfExp i) _ = BoolVal b
 
 eval (BoolOpExp op e1 e2) env =
   let v1 = eval e1 env
@@ -60,6 +61,12 @@ eval (VarExp var) env =
 eval (LetExp var e1 e2) env =
   let v1 = eval e1 env
    in eval e2 (insert var v1 env)
+
+eval (IfExp e1 e2 e3) env =
+  let v1 = eval e1 env
+   in case v1 of
+       BoolVal True -> eval e2 env
+       _            -> eval e3 env
 
 repl :: Env -> IO ()
 repl env = runInputT defaultSettings loop
